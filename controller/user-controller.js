@@ -25,7 +25,14 @@ exports.getUserById = async (req, res) => {
 
   try {
     let dataUser = await userModel.findOne({ where: { id: idUser } });
-    res.status(200).json(dataUser);
+    if (dataUser != null) {
+      res.status(200).json(dataUser);
+    } else {
+      res.status(404).json({
+        succes: false,
+        message: "User not found",
+      });
+    }
   } catch (error) {
     return res.status(404).json({
       success: false,
@@ -104,7 +111,7 @@ exports.changePassword = async (req, res) => {
 
   let dataUser = {
     currentPassword: req.body.currentPassword,
-    newPassword: req.body.newPassword
+    newPassword: req.body.newPassword,
   };
 
   try {
@@ -127,7 +134,7 @@ exports.changePassword = async (req, res) => {
     const isPasswordValid = bcrypt.compareSync(
       dataUser.currentPassword,
       existingUser.password
-    );    
+    );
 
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -137,14 +144,25 @@ exports.changePassword = async (req, res) => {
     }
 
     if (dataUser.newPassword) {
+      const isNewPassword = bcrypt.compareSync(
+        dataUser.newPassword,
+        existingUser.password
+      );
+
+      if (isNewPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "New password cannot be the same as the current password",
+        });
+      }
+
       dataUser.password = bcrypt.hashSync(dataUser.newPassword, 10);
-    } 
-    else {
+    } else {
       return res.status(400).json({
         success: false,
         message: "Field 'newPassword' cannot be empty.",
       });
-    }    
+    }
 
     const result = await userModel.update(dataUser, {
       where: { id: idUser },
@@ -164,6 +182,7 @@ exports.changePassword = async (req, res) => {
   }
 };
 
+/* MODUL
 exports.deleteUser = async (req, res) => {
   let idUser = req.params.id;
   try {
@@ -181,6 +200,31 @@ exports.deleteUser = async (req, res) => {
           message: err.message,
         });
       });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}; */
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const idUser = req.params.id;
+
+    const result = await userModel.destroy({ where: { id: idUser } });
+
+    if (result === 1) {
+      return res.status(200).json({
+        success: true,
+        message: "Data user has been deleted",
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
   } catch (error) {
     return res.status(500).json({
       success: false,
