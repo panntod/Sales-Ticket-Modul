@@ -5,20 +5,32 @@ exports.getAllUser = async (req, res) => {
   try {
     let dataUser = await userModel.findAll();
 
+    const responseUsers = dataUser.map((user) => {
+      const { id, firstname, lastname, email, role } = user;
+      return {
+        id,
+        firstname,
+        lastname,
+        email,
+        role,
+      };
+    });
+
     return res.status(200).json({
       success: true,
-      data: dataUser,
-      message: "All User have been loaded",
+      data: responseUsers,
+      message: "All users have been loaded",
     });
   } catch (error) {
     console.error("Error in getAllUser:", error);
     return res.status(500).json({
       success: false,
       data: null,
-      message: "Data user is empty",
+      message: "Internal Server Error",
     });
   }
 };
+
 
 exports.getUserById = async (req, res) => {
   let idUser = req.params.id;
