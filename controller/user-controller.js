@@ -26,17 +26,27 @@ exports.getUserById = async (req, res) => {
   try {
     let dataUser = await userModel.findOne({ where: { id: idUser } });
     if (dataUser != null) {
-      res.status(200).json(dataUser);
+      const { id, firstname, lastname, email, role } = dataUser;
+
+      const responseUser = {
+        id,
+        firstname,
+        lastname,
+        email,
+        role,
+      };
+
+      res.status(200).json(responseUser);
     } else {
       res.status(404).json({
-        succes: false,
+        success: false,
         message: "User not found",
       });
     }
   } catch (error) {
-    return res.status(404).json({
+    return res.status(500).json({
       success: false,
-      message: "User Not Found",
+      message: "Internal Server Error",
     });
   }
 };
