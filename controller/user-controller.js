@@ -154,6 +154,7 @@ exports.changePassword = async (req, res) => {
     }
 
     const isPasswordValid = bcrypt.compareSync(
+      // di md5 menggunakan comparePasswords
       dataUser.currentPassword,
       existingUser.password
     );
