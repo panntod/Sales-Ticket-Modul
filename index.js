@@ -16,8 +16,10 @@ app.use(
 app.use(express.static(__dirname));
 
 const userRouter = require("./routes/user-route");
+const eventRouter = require("./routes/event-route");
 
 app.use("/user", userRouter);
+app.use("/event", eventRouter);
 
 app.listen(port, () => {
   console.log(`Server listen to ${port}`);
