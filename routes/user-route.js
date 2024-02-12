@@ -10,7 +10,7 @@ router.get("/getAll", userController.getAllUser);
 router.get("/:id", userController.getUserById);
 router.post("/", userController.addUser);
 router.put("/:id", userController.updateUserById);
-router.patch("/:id", userController.changePassword);
+router.patch("/", userController.changePassword);
 router.delete("/:id", IsAdmin, userController.deleteUser);
 
 // router.get("/getAll", authorize, IsAdmin, userController.getAllUser);
