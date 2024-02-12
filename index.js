@@ -4,6 +4,7 @@ const dotenv = require("dotenv").config();
 const cors = require(`cors`);
 const app = express();
 const port = process.env.APP_PORT;
+const mainRoute = require("./routes/main-route")
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,16 +15,7 @@ app.use(
   })
 );
 app.use(express.static(__dirname));
-
-const userRouter = require("./routes/user-route");
-const eventRouter = require("./routes/event-route");
-const ticketRouter = require("./routes/ticket-route");
-const auth = require(`./routes/auth-route`);
-
-app.use("/login", auth);
-app.use("/user", userRouter);
-app.use("/event", eventRouter);
-app.use("/ticket", ticketRouter);
+app.use(mainRoute)
 
 app.listen(port, () => {
   console.log(`Server listen to ${port}`);
