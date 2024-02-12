@@ -129,9 +129,8 @@ exports.updateUserById = async (req, res) => {
 };
 
 exports.changePassword = async (req, res) => {
-  let idUser = req.params.id;
-
   let dataUser = {
+    email: req.body.email,
     currentPassword: req.body.currentPassword,
     newPassword: req.body.newPassword,
   };
@@ -144,7 +143,7 @@ exports.changePassword = async (req, res) => {
       });
     }
 
-    const existingUser = await userModel.findOne({ where: { id: idUser } });
+    const existingUser = await userModel.findOne({ where: { email: dataUser.email } });
 
     if (!existingUser) {
       return res.status(404).json({
@@ -154,7 +153,6 @@ exports.changePassword = async (req, res) => {
     }
 
     const isPasswordValid = bcrypt.compareSync(
-      // di md5 menggunakan comparePasswords
       dataUser.currentPassword,
       existingUser.password
     );
@@ -188,12 +186,13 @@ exports.changePassword = async (req, res) => {
     }
 
     const result = await userModel.update(dataUser, {
-      where: { id: idUser },
+      where: { email: dataUser.email },
     });
 
+    dataUser.newPassword = dataUser.password = dataUser.currentPassword = "You cannot access this data from there"
     return res.status(201).json({
       success: true,
-      status: result,
+      data: dataUser,
       message: "Password has been updated",
     });
   } catch (err) {
