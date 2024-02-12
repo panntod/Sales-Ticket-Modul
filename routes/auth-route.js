@@ -1,10 +1,10 @@
 const express = require(`express`)
-const app = express()
+const router = express.Router();
 
-app.use(express.json())
+router.use(express.json())
 
 const authController = require(`../middleware/auth`)
 
-app.post('/', authController.authenticate)
+router.post('/', authController.authenticate)
 
-module.exports = app
+module.exports = router
