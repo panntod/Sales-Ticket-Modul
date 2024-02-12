@@ -13,4 +13,11 @@ app.put("/:id", userController.updateUserById);
 app.patch("/:id", userController.changePassword);
 app.delete("/:id", IsAdmin, userController.deleteUser);
 
+// app.get("/getAll", authorize, IsAdmin, userController.getAllUser);
+// app.get("/:id", authorize, IsAdmin, userController.getUserById);
+// app.post("/", userController.addUser);
+// app.put("/:id", authorize, IsAdmin, validateUser, userController.updateUserById);
+// app.patch("/:id", IsUser, userController.changePassword);
+// app.delete("/:id", authorize, IsAdmin, userController.deleteUser);
+
 module.exports = app;
