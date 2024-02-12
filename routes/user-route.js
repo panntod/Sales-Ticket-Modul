@@ -1,23 +1,23 @@
 const express = require("express");
-const app = express();
+const router = express.Router();
 
 const { validateUser } = require("../middleware/user-premision");
 const userController = require("../controller/user-controller");
 const { authorize } = require("../middleware/auth");
 const { IsUser, IsAdmin } = require("../middleware/role-validation");
 
-app.get("/getAll", userController.getAllUser);
-app.get("/:id", userController.getUserById);
-app.post("/", userController.addUser);
-app.put("/:id", userController.updateUserById);
-app.patch("/:id", userController.changePassword);
-app.delete("/:id", IsAdmin, userController.deleteUser);
+router.get("/getAll", userController.getAllUser);
+router.get("/:id", userController.getUserById);
+router.post("/", userController.addUser);
+router.put("/:id", userController.updateUserById);
+router.patch("/:id", userController.changePassword);
+router.delete("/:id", IsAdmin, userController.deleteUser);
 
-// app.get("/getAll", authorize, IsAdmin, userController.getAllUser);
-// app.get("/:id", authorize, IsAdmin, userController.getUserById);
-// app.post("/", userController.addUser);
-// app.put("/:id", authorize, IsAdmin, validateUser, userController.updateUserById);
-// app.patch("/:id", IsUser, userController.changePassword);
-// app.delete("/:id", authorize, IsAdmin, userController.deleteUser);
+// router.get("/getAll", authorize, IsAdmin, userController.getAllUser);
+// router.get("/:id", authorize, IsAdmin, userController.getUserById);
+// router.post("/", userController.addUser);
+// router.put("/:id", authorize, IsAdmin, validateUser, userController.updateUserById);
+// router.patch("/:id", IsUser, userController.changePassword);
+// router.delete("/:id", authorize, IsAdmin, userController.deleteUser);
 
-module.exports = app;
+module.exports = router;
