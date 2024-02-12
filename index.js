@@ -17,9 +17,13 @@ app.use(express.static(__dirname));
 
 const userRouter = require("./routes/user-route");
 const eventRouter = require("./routes/event-route");
+const ticketRouter = require("./routes/ticket-route");
+const auth = require(`./routes/auth-route`);
 
+app.use("/login", auth);
 app.use("/user", userRouter);
 app.use("/event", eventRouter);
+app.use("/ticket", ticketRouter);
 
 app.listen(port, () => {
   console.log(`Server listen to ${port}`);
