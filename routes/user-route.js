@@ -1,15 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const { validateUser } = require("../middleware/user-premision");
 const userController = require("../controller/user-controller");
 const { authorize } = require("../middleware/auth");
-const { IsUser, IsAdmin } = require("../middleware/role-validation");
+const { ValidateRegister, IsAdmin, IsUser } = require("../middleware/validation");
 
 router.get("/getAll", userController.getAllUser);
 router.get("/:id", userController.getUserById);
-router.post("/", userController.addUser);
-router.put("/:id", userController.updateUserById);
+router.post("/", ValidateRegister, userController.register);
+router.put("/:id", ValidateRegister, userController.updateUserById);
 router.patch("/", userController.changePassword);
 router.delete("/:id", IsAdmin, userController.deleteUser);
 
