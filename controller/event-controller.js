@@ -80,7 +80,7 @@ exports.addEvent = (req, res) => {
         return res.json({
           success: true,
           data: result,
-          message: `New event has been inserted`,
+          message: `New event has been created`,
         });
       })
       .catch((error) => {
