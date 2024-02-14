@@ -1,8 +1,7 @@
 const express = require(`express`)
 const ticketController = require(`../controller/ticket-controller`)
 const { authorize } = require("../middleware/auth")
-const { IsAdmin } = require("../middleware/role-validation")
-
+const { IsAdmin} = require("../middleware/user-validation");
 const router = express.Router();
 
 router.use(express.json())
