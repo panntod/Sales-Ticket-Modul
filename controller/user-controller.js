@@ -39,7 +39,6 @@ exports.getUserById = async (req, res) => {
     let dataUser = await userModel.findOne({ where: { id: idUser } });
     if (dataUser != null) {
       const { id, firstname, lastname, email, role } = dataUser;
-
       const responseUser = {
         id,
         firstname,
@@ -63,7 +62,7 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-exports.addUser = async (req, res) => {
+exports.register = async (req, res) => {
   let newUser = {
     firstname: req.body.firstname,
     lastname: req.body.lastname,
@@ -77,7 +76,7 @@ exports.addUser = async (req, res) => {
     return res.json({
       success: true,
       data: result,
-      message: "New member has been inserted",
+      message: "New member has been created",
     });
   } catch (error) {
     return res.json({
