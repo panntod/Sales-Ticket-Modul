@@ -4,6 +4,10 @@ POST  http://localhost:5000/login/
 Content-Type: application/json
 
 {
-     "email": "admin@gmail.com", 
+     "email": "pandhu@gmail.com", 
      "password": "admin"
 }
+###
+# Get All 
+GET  http://localhost:5000/user/getAll
+Content-Type: application/json
