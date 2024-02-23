@@ -3,7 +3,7 @@ const router = express.Router();
 
 const eventController = require('../controller/event-controller')
 const { authorize } = require('../middleware/auth')
-const { IsAdmin, IsUser } = require("../middleware/user-validation");
+const { IsAdmin, IsUser } = require("../middleware/validation");
 
 router.get("/", authorize, IsAdmin, eventController.getAllEvent)
 router.get("/:key", authorize, IsUser, eventController.findEvent)
