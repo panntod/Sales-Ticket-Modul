@@ -2,14 +2,14 @@ const express = require("express");
 const router = express.Router();
 
 const userController = require("../controller/user-controller");
-const { authorize } = require("../middleware/auth");
+const { authorize, authenticate } = require("../middleware/auth");
 const { ValidateRegister, IsAdmin, IsUser } = require("../middleware/validation");
 
 router.get("/getAll", userController.getAllUser);
 router.get("/:id", userController.getUserById);
 router.post("/", ValidateRegister, userController.register);
 router.put("/:id", ValidateRegister, userController.updateUserById);
-router.patch("/", userController.changePassword);
+router.patch("/", userController.resetPassword);
 router.delete("/:id", IsAdmin, userController.deleteUser);
 
 // router.get("/getAll", authorize, IsAdmin, userController.getAllUser);
