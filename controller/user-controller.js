@@ -1,5 +1,9 @@
 const userModel = require("../models/index").user;
-const bcrypt = require("bcrypt");
+const {
+  ComparePassword,
+  GeneratePassword,
+} = require("../helpers/passwordHelpers");
+const { GenerateToken } = require("../helpers/tokenHelpers");
 
 exports.getAllUser = async (req, res) => {
   try {
@@ -30,7 +34,6 @@ exports.getAllUser = async (req, res) => {
     });
   }
 };
-
 
 exports.getUserById = async (req, res) => {
   let idUser = req.params.id;
@@ -68,20 +71,68 @@ exports.register = async (req, res) => {
     lastname: req.body.lastname,
     email: req.body.email,
     role: req.body.role,
-    password: bcrypt.hashSync(req.body.password, 10),
+    password: await GeneratePassword(req.body.password),
   };
 
   try {
-    const result = await userModel.create(newUser);
+    await userModel.create(newUser);
     return res.json({
       success: true,
-      data: result,
+      data: "You cannot access this data",
       message: "New member has been created",
     });
   } catch (error) {
     return res.json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  let { email, password, newPassword } = req.body;
+
+  try {
+    const findUser = await userModel.findOne({
+      where: { email: email },
+    });
+
+    if (!findUser) {
+      return res.status(404).json({
+        success: false,
+        status: result,
+        message: "User not found",
+      });
+    }
+
+    const isValidPassword = await ComparePassword(password, findUser.password);
+
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        status: "Unauthorized",
+        message: "Incorrect Password",
+      });
+    }
+
+    const hashed = await GeneratePassword(newPassword);
+
+    const result = await userModel.update(
+      { password: hashed },
+      { where: { email: email } }
+    );
+
+    return res.status(200).json({
+      success: true,
+      status: result,
+      message: "Data user has been updated",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(501).json({
+      success: false,
+      message: err.message,
+      error: err,
     });
   }
 };
@@ -127,108 +178,6 @@ exports.updateUserById = async (req, res) => {
   }
 };
 
-exports.changePassword = async (req, res) => {
-  let dataUser = {
-    email: req.body.email,
-    currentPassword: req.body.currentPassword,
-    newPassword: req.body.newPassword,
-  };
-
-  try {
-    if (!dataUser.currentPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Current password is required for updating user",
-      });
-    }
-
-    const existingUser = await userModel.findOne({ where: { email: dataUser.email } });
-
-    if (!existingUser) {
-      return res.status(404).json({
-        success: false,
-        message: "User Not Found",
-      });
-    }
-
-    const isPasswordValid = bcrypt.compareSync(
-      dataUser.currentPassword,
-      existingUser.password
-    );
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Current password is incorrect",
-      });
-    }
-
-    if (dataUser.newPassword) {
-      const isNewPassword = bcrypt.compareSync(
-        dataUser.newPassword,
-        existingUser.password
-      );
-
-      if (isNewPassword) {
-        return res.status(400).json({
-          success: false,
-          message: "New password cannot be the same as the current password",
-        });
-      }
-
-      dataUser.password = bcrypt.hashSync(dataUser.newPassword, 10);
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Field 'newPassword' cannot be empty.",
-      });
-    }
-
-    const result = await userModel.update(dataUser, {
-      where: { email: dataUser.email },
-    });
-
-    dataUser.newPassword = dataUser.password = dataUser.currentPassword = "You cannot access this data from there"
-    return res.status(201).json({
-      success: true,
-      data: dataUser,
-      message: "Password has been updated",
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-};
-
-/* MODUL
-exports.deleteUser = async (req, res) => {
-  let idUser = req.params.id;
-  try {
-    userModel
-      .destroy({ where: { id: idUser } })
-      .then((result) => {
-        return res.status(200).json({
-          success: true,
-          message: "Data user has been deleted",
-        });
-      })
-      .catch((err) => {
-        return res.status(500).json({
-          success: false,
-          message: err.message,
-        });
-      });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-}; */
-
 exports.deleteUser = async (req, res) => {
   try {
     const idUser = req.params.id;
@@ -252,4 +201,45 @@ exports.deleteUser = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+exports.authenticate = async (req, res) => {
+  let dataLogin = {
+    email: req.body.email,
+    password: req.body.password,
+  };
+
+  let dataUser = await userModel.findOne({ where: { email: dataLogin.email } });
+
+  if (dataUser) {
+    const passwordMatch = await ComparePassword(
+      req.body.password,
+      dataUser.password
+    );
+
+    if (passwordMatch) {
+      const token = GenerateToken(dataLogin);
+      dataUser.password = "you cannot access this data"
+
+      return res.status(200).json({
+        token: token,
+        success: true,
+        logged: true,
+        data: dataUser,
+        message: "Authentication Success",
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        logged: false,
+        message: "Invalid Password",
+      });
+    }
+  }
+
+  return res.status(500).json({
+    success: false,
+    logged: false,
+    message: "Authentication Failed.",
+  });
 };
