@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.use(express.json())
 
-const authController = require(`../middleware/auth`)
+const authController = require(`../controller/user-controller`)
 
 router.post('/', authController.authenticate)
 
